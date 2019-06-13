@@ -30,11 +30,10 @@ def get_photo_sizes(photo_id, api_key):
 
 
 def extract_photo_id(url):
-    m = re.search("flickr.com/photos/\w+/(\d+)", url)
+    m = url.split("/")
     if m:
-        return m.groups()[0]
+        return m[5]
     else:
-        # a
         return url
 
 if __name__ == '__main__':
@@ -42,7 +41,7 @@ if __name__ == '__main__':
     # set API key
     api_key = "0e2a8ad6233af18575753b1bce914a26"
 
-    url = "https://www.flickr.com/photos/zokuga/14392889220/"
+    url = "https://www.flickr.com/photos/97042891@N00/943750056"
     photo_id = extract_photo_id(url)
     photo_info = get_photo_info(photo_id, api_key)
     sizes_info = get_photo_sizes(photo_id, api_key)
