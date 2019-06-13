@@ -1,5 +1,6 @@
 import re
 import requests
+from PIL import Image
 
 BASE_URL = 'https://api.flickr.com/services/rest/'
 MAX_DISPLAYABLE_PHOTO_DIMENSION = 1600  # i.e. a photo with width and height <= 1600
@@ -45,8 +46,10 @@ if __name__ == '__main__':
     photo_id = extract_photo_id(url)
     photo_info = get_photo_info(photo_id, api_key)
     sizes_info = get_photo_sizes(photo_id, api_key)
-    print(photo_info)
-    print()
-    print(sizes_info['sizes'])
+    # print(photo_info)
+    # print()
+    url = sizes_info['sizes']['size'][0]['source']
 
+    im = Image.open(requests.get(url, stream=True).raw)
+    print(im)
 
