@@ -18,7 +18,7 @@ def process_category(category_data, user_data, post_data):
                                       'Uid': data['Uid']
                                       }
 
-        # then uppdate the user data
+        # then update the user data
         if data['Uid'] in user_data.keys():
             if data['Pid'] in user_data[data['Uid']].keys():
                 user_data[data['Uid']][data['Pid']]['Category'] = data['Category']
@@ -55,7 +55,7 @@ def process_tags(tags_data, user_data, post_data):
                                       'Uid': data['Uid']
                                       }
 
-        # then uppdate the user data
+        # then update the user data
         if data['Uid'] in user_data.keys():
             if data['Pid'] in user_data[data['Uid']].keys():
                 user_data[data['Uid']][data['Pid']]['Title'] = data['Title']
@@ -94,7 +94,7 @@ def process_geo(geo_data, user_data, post_data):
                                       'Uid': data['Uid']
                                       }
 
-        # then uppdate the user data
+        # then update the user data
         if data['Uid'] in user_data.keys():
             if data['Pid'] in user_data[data['Uid']].keys():
                 user_data[data['Uid']][data['Pid']]['Postdate'] = time.strftime("%Y-%m-%d %H:%M:%S",
@@ -125,6 +125,27 @@ def process_geo(geo_data, user_data, post_data):
     return user_data, post_data
 
 
+def process_image_url(image_urls, user_data, post_data, helper_data):
+    for ind, data in enumerate(helper_data):
+        # first update the post data
+        if data['Pid'] in post_data.keys():
+            post_data[data['Pid']]['image_url'] = image_urls[ind]
+        else:
+            post_data[data['Pid']] = {'image_url': image_urls[ind]}
+
+        # then update the user data
+        if data['Uid'] in user_data.keys():
+            if data['Pid'] in user_data[data['Uid']].keys():
+                user_data[data['Uid']][data['Pid']]['image_url'] = image_urls[ind]
+            else:
+                user_data[data['Uid']][data['Pid']] = {'image_url': image_urls[ind]}
+        else:
+            user_data[data['Uid']] = {
+                data['Pid']: {'image_url': image_urls[ind]}
+            }
+    return user_data, post_data
+
+
 if __name__ == '__main__':
     user_dataset = {}
     post_dataset = {}
@@ -143,6 +164,12 @@ if __name__ == '__main__':
         geo_data = json.load(json_file)
     user_dataset, post_dataset = process_geo(geo_data, user_dataset, post_dataset)
     print('Temporal-Spatial features added')
+
+    with open('data/train_all_json/train_img.txt') as f:
+        image_urls = f.readlines()
+    image_urls = [x.strip() for x in image_urls]
+    user_dataset, post_dataset = process_image_url(image_urls, user_dataset, post_dataset, category_data)
+    print('Image urls added')
 
     with open('data/our_jsons/user_dataset.json', 'w') as outfile:
         json.dump(user_dataset, outfile)
