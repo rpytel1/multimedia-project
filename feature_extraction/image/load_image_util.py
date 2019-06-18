@@ -9,8 +9,6 @@ API_KEY = "0e2a8ad6233af18575753b1bce914a26"
 API_KEY2 = "9c5e293c8f652b701785ba4dc2ecd5d0"
 
 
-
-
 def get_photo_info(photo_id):
     atts = {'api_key': API_KEY,
             'format': 'json',
