@@ -14,7 +14,7 @@ def extract_cv_feats(photo, with_sift=False):
     feats = {"hsv_hist": extract_hsv_histogram(photo), "hog": extract_hog_features(photo)}
     if with_sift:
         feats["sift"] = extract_sift_features(photo)
-    return True
+    return feats
 
 
 def extract_hsv_histogram(photo):

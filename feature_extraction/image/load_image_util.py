@@ -41,6 +41,9 @@ def extract_photo_id(url):
 
 def get_img(sizes_info):
     url = sizes_info['sizes']['size'][0]['source']
-    im = Image.open(requests.get(url, stream=True).raw)
-    imcv = cv2.cvtColor(np.asarray(im), cv2.COLOR_RGB2BGR)
+    im = np.asarray(Image.open(requests.get(url, stream=True).raw))
+    if len(im.shape) is 3:
+        imcv = cv2.cvtColor(im, cv2.COLOR_RGB2BGR)
+    else:
+        imcv = cv2.cvtColor(im, cv2.COLOR_GRAY2BGR)
     return imcv
