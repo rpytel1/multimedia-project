@@ -1,4 +1,3 @@
-import json
 import pickle
 
 from feature_extraction.image.extract_img_feat import extract_feats_from_photo_metadata, extract_cv_feats
@@ -22,5 +21,5 @@ if __name__ == '__main__':
         photo_metadata.update(photo_cv_feats)
         dict_list.append(photo_metadata)
 
-    with open('data/img_feats/data.pickle', 'wb') as handle:
+    with open('data/our_jsons/img_feats.pickle', 'wb') as handle:
         pickle.dump(dict_list, handle, protocol=pickle.HIGHEST_PROTOCOL)

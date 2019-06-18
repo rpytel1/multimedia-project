@@ -10,12 +10,8 @@ API_KEY2 = "9c5e293c8f652b701785ba4dc2ecd5d0"
 
 
 def get_photo_info(photo_id):
-    atts = {'api_key': API_KEY,
-            'format': 'json',
-            'method': 'flickr.photos.getInfo',
-            'nojsoncallback': 1
-            }
-    atts['photo_id'] = photo_id
+    atts = {'api_key': API_KEY, 'format': 'json', 'method': 'flickr.photos.getInfo', 'nojsoncallback': 1,
+            'photo_id': photo_id}
     photo = requests.get(BASE_URL, params=atts).json()['photo']
     return photo
 
@@ -38,6 +34,7 @@ def extract_photo_id(url):
         return m[5]
     else:
         return url
+
 
 def get_img(sizes_info):
     url = sizes_info['sizes']['size'][0]['source']
