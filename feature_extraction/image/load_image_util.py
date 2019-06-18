@@ -1,9 +1,14 @@
+import cv2
 import requests
 from PIL import Image
+import numpy as np
 
 BASE_URL = 'https://api.flickr.com/services/rest/'
 MAX_DISPLAYABLE_PHOTO_DIMENSION = 1600  # i.e. a photo with width and height <= 1600
 API_KEY = "0e2a8ad6233af18575753b1bce914a26"
+API_KEY2 = "9c5e293c8f652b701785ba4dc2ecd5d0"
+
+
 
 
 def get_photo_info(photo_id):
@@ -38,4 +43,6 @@ def extract_photo_id(url):
 
 def get_img(sizes_info):
     url = sizes_info['sizes']['size'][0]['source']
-    return Image.open(requests.get(url, stream=True).raw)
+    im = Image.open(requests.get(url, stream=True).raw)
+    imcv = cv2.cvtColor(np.asarray(im), cv2.COLOR_RGB2BGR)
+    return imcv
