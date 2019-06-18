@@ -17,7 +17,7 @@ def get_photo_info(photo_id):
 
 
 def get_photo_sizes(photo_id):
-    atts = {'api_key': API_KEY,
+    atts = {'api_key': API_KEY2,
             'format': 'json',
             'method': 'flickr.photos.getSizes',
             'nojsoncallback': 1,
