@@ -1,0 +1,1 @@
+def extract_feats_from_photo_metadata(photo_metadata):

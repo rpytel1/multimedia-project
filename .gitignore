@@ -91,7 +91,18 @@ fabric.properties
 
 # Sonarlint plugin
 .idea/sonarlint
-
+.installed.cfg
+bin
+develop-eggs
+dist
+downloads
+eggs
+parts
+src/*.egg-info
+lib
+lib64
+*.pyc
+*.pyo
 # End of https://www.gitignore.io/api/pycharm,jupyternotebook
 .idea/
 data/
