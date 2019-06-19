@@ -1,34 +1,65 @@
+import json
+
+import pandas as pd
 from scipy import spatial
-import numpy as np
+
+usr_to_post_dict_train = {}
+post_to_usr_test = {}
+post_cos_matrix = {}
+
+train_set = {}
+test_set = {}
+cosine_matrix = {}
 
 
-def recommendations(title, cosine_sim=cosine_sim):
-    # initializing the empty list of recommended movies
-    recommended_movies = []
-
-    # gettin the index of the movie that matches the title
-    idx = indices[indices == title].index[0]
-
-    # creating a Series with the similarity scores in descending order
-    score_series = pd.Series(cosine_sim[idx]).sort_values(ascending=False)
-
-    # getting the indexes of the 10 most similar movies
-    top_10_indexes = list(score_series.iloc[1:11].index)
-
-    # populating the list with the titles of the best 10 matching movies
-    for i in top_10_indexes:
-        recommended_movies.append(list(df.index)[i])
-
-    return recommended_movies
+def get__usr_to_post_dict(data):
+    for key, value in data.items():
+        usr_to_post_dict_train[key] = list(value["train_set"].keys())
 
 
-def calculate_cosine_sim_matrix(train_set, test_set):
-    rows = len(train_set)
-    cols = len(test_set)
-    matrix = np.zeros((rows, cols))
-    for rows
-    return matrix
+def get_post_to_usr_dict(data):
+    for key, value in data.items():
+        for post_key, post_value in value["test_set"].items():
+            post_to_usr_test[post_key] = key
+
+
+def prepare_for_matrix_calculations(data, feature_type):
+    for key, value in data.items():
+        for post_key, post_value in value["train_set"].items():
+            train_set[post_key] = post_value[feature_type]
+        for post_key, post_value in value["test_set"].items():
+            test_set[post_key] = post_value[feature_type]
+
+
+def create_empty_cosine_sim_matrix():
+    for key_train, value_train in train_set.items():
+        cosine_matrix[key_train] = {}
+
+
+def calculate_cosine_sim_matrix():
+    for key_train, value_train in train_set.items():
+        for key_test, value_test in test_set.items():
+            cosine = calculate_cosine(value_train, value_test)
+            cosine_matrix[key_train][key_test] = cosine
 
 
 def calculate_cosine(elem1, elem2):
     return 1 - spatial.distance.cosine(elem1, elem2)
+
+
+def get_recommendations(top_k):
+    df = pd.DataFrame.from_dict(cosine_matrix)
+    df = df.sum(axis=1)
+    df = df.nlargest(top_k)
+    return df.index.tolist()
+
+
+if __name__ == '__main__':
+    with open('../../data/our_jsons/test.json') as json_file:
+        data_json = json.load(json_file)
+    get__usr_to_post_dict(data_json)
+    get_post_to_usr_dict(data_json)
+    prepare_for_matrix_calculations(data_json, "all")
+    create_empty_cosine_sim_matrix()
+    calculate_cosine_sim_matrix()
+    get_recommendations(1)
