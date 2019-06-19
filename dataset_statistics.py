@@ -17,6 +17,13 @@ def remove_users(user_data, binary_users):
     return fin_data
 
 
+def find_number_of_videos(user_data):
+    videos = {}
+    for user in user_data.keys():
+        videos[user] = sum([val['Mediatype'] == 'video' for val in user_data[user].values()])
+    return videos
+
+
 if __name__ == '__main__':
     with open('data/our_jsons/user_dataset.json') as json_file:
         user_data = json.load(json_file)
@@ -56,6 +63,10 @@ if __name__ == '__main__':
 
     # with open('data/our_jsons/user_dataset_updated.json', 'w') as outfile:
     #     json.dump(user_removed, outfile)
+
+    videos_per_user = find_number_of_videos(user_data)
+    print('Total number of videos: ' + str(sum(videos_per_user.values())))
+    # print('Number of videos for user 3175@N73: ' + str(videos_per_user['3175@N73']))
 
 
 
