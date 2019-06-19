@@ -105,4 +105,4 @@ lib64
 *.pyo
 # End of https://www.gitignore.io/api/pycharm,jupyternotebook
 .idea/
-data/
+
