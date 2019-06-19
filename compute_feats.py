@@ -25,12 +25,15 @@ if __name__ == '__main__':
     for key, value in user_data.items():
         user_value = {}
         for post_key, post_value in value.items():
-            post_value["img_feats"] = get_img_feats(post_value["image_url"])
-            user_value[post_key] = post_value
+            if post_value["Mediatype"] == 'photo':
+                try:
+                    post_value["img_feats"] = get_img_feats(post_value["image_url"])
+                    user_value[post_key] = post_value
+                except KeyError:
+                    print("KeyError")
             print(i)
             i += 1
         final_dict[key] = user_value
 
     with open('data/our_jsons/user_dataset_computed.pickle', 'wb') as handle:
         pickle.dump(final_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
