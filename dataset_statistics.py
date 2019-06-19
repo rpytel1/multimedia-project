@@ -29,10 +29,12 @@ if __name__ == '__main__':
         user_data = json.load(json_file)
 
     posts_per_user = find_user_posts(user_data)
+    videos_per_user = find_number_of_videos(user_data)
     print('Mean value of posts per user: ' + str(mean(list(posts_per_user.values()))))
     print('Std value of posts per user: ' + str(stdev(list(posts_per_user.values()))))
     print('Median value of posts per user: ' + str(median(list(posts_per_user.values()))))
     print('Mode value of posts per user: ' + str(mode(list(posts_per_user.values()))))
+    print('Total number of videos: ' + str(sum(videos_per_user.values())))
     print('Number of users with 1 post: ' + str(list(posts_per_user.values()).count(1)))
 
     at_least_10 = list(map(lambda x: x >= 10, list(posts_per_user.values())))
@@ -46,10 +48,25 @@ if __name__ == '__main__':
 
     print('Number of users with at least 50 posts: ' + str(sum(at_least_50)))
     print('Number of posts of uses with at least 50 posts: ' + str(sum(posts_at_least_50)))
+
+    at_least_100 = list(map(lambda x: x >= 100, list(posts_per_user.values())))
+    posts_at_least_100 = [a * b for a, b in zip(at_least_100, list(posts_per_user.values()))]
+
+    print('Number of users with at least 100 posts: ' + str(sum(at_least_100)))
+    print('Number of posts of uses with at least 100 posts: ' + str(sum(posts_at_least_100)))
     print('Total number of users: ' + str(len(posts_per_user.values())))
 
+    at_least_200 = list(map(lambda x: x >= 200, list(posts_per_user.values())))
+    posts_at_least_200 = [a * b for a, b in zip(at_least_200, list(posts_per_user.values()))]
+
+    print('Number of users with at least 200 posts: ' + str(sum(at_least_200)))
+    print('Number of posts of uses with at least 200 posts: ' + str(sum(posts_at_least_200)))
+    print('Total number of users: ' + str(len(posts_per_user.values())))
+
+    users_to_keep = at_least_200
+
     user_removed = remove_users(user_data, ['remove' if not a else b
-                                            for a, b in zip(at_least_50, list(posts_per_user.keys()))])
+                                            for a, b in zip(users_to_keep, list(posts_per_user.keys()))])
 
     posts_per_user_v2 = find_user_posts(user_removed)
     print('-------------------------- New Statistics --------------------------')
@@ -61,12 +78,5 @@ if __name__ == '__main__':
     print('Total number of users: ' + str(len(posts_per_user_v2.values())))
     print('Total number of posts: ' + str(sum(posts_per_user_v2.values())))
 
-    # with open('data/our_jsons/user_dataset_updated.json', 'w') as outfile:
-    #     json.dump(user_removed, outfile)
-
-    videos_per_user = find_number_of_videos(user_data)
-    print('Total number of videos: ' + str(sum(videos_per_user.values())))
-    # print('Number of videos for user 3175@N73: ' + str(videos_per_user['3175@N73']))
-
-
-
+    with open('data/our_jsons/user_dataset_updated.json', 'w') as outfile:
+        json.dump(user_removed, outfile)
