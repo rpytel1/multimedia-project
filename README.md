@@ -9,19 +9,20 @@
 
 ## Organization of data for training
 ```bash
-{"user_id1":{"post_id1":{
-                        "train_set":{ "category":[],
+{"user_id1":{"train_set":{"post_id1":{"category":[],
                                       "tags":[],
                                       "image":[],
                                       "all":[]
                         
                         
-                        },
-                        "test_set":{same as train_set}
+                                    },
+                          "post_id2":{...}
+                          ...
+                         }
+             "test_set":{same as train_set}
+                  
                         
            },
-           "post_id2":{...}
-
     }
  "user_id2"{...}
  ...
