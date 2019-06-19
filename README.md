@@ -28,10 +28,11 @@
 }
 
 ```
-(outer key- UID=> dict of posts=>a)keys of feats: "category", "tags", "image" and "all")
+## Obtain data
+We used data from [Social Media Prediction Challenge](http://smp-challenge.com/). It should be stored in directory _data/train_all_json/_.
 
 ## Cofiguration
-In order to install all required dependencies reformat data for recommendation task run following command.
+In order to install all required dependencies and reformat data for recommendation task run following command.
 ```bash
 ./configure.sh
 ```
