@@ -2,6 +2,7 @@ import cv2
 import requests
 from PIL import Image
 import numpy as np
+from io import BytesIO
 
 BASE_URL = 'https://api.flickr.com/services/rest/'
 MAX_DISPLAYABLE_PHOTO_DIMENSION = 1600  # i.e. a photo with width and height <= 1600
@@ -38,7 +39,8 @@ def extract_photo_id(url):
 
 def get_img(sizes_info):
     url = sizes_info['sizes']['size'][0]['source']
-    im = np.asarray(Image.open(requests.get(url, stream=True).raw))
+    # im = np.asarray(Image.open(requests.get(url, stream=True).raw))
+    im = np.asarray(Image.open(BytesIO((requests.get(url, stream=True)).content)))
     if len(im.shape) is 3:
         imcv = cv2.cvtColor(im, cv2.COLOR_RGB2BGR)
     else:

@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
 import json
+import pickle
 
 
 def make_category(data):
@@ -48,6 +49,9 @@ def split_data(data, usr_data):
 if __name__ == '__main__':
     with open('data/our_jsons/user_dataset_updated.json') as json_file:
         user_data = json.load(json_file)
+
+    # with open("data/our_jsons/user_dataset_computed.pickle", "rb") as input_file:
+    #     complete_data = pickle.load(input_file)
 
     # split data to feature categories
     category_dict = {}

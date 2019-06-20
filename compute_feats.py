@@ -1,6 +1,6 @@
 import json
 import pickle
-
+from json.decoder import JSONDecodeError
 from feature_extraction.image.extract_img_feat import extract_feats_from_photo_metadata, extract_cv_feats
 from feature_extraction.image.load_image_util import extract_photo_id, get_photo_info, get_photo_sizes, get_img
 
@@ -31,6 +31,10 @@ if __name__ == '__main__':
                     user_value[post_key] = post_value
                 except KeyError:
                     print("KeyError")
+                except OSError:
+                    print("OSError")
+                except JSONDecodeError:
+                    print("JSONDecodeError")
             print(i)
             i += 1
         final_dict[key] = user_value
