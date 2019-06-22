@@ -45,7 +45,7 @@ def create_empty_cosine_sim_matrix(train_set):
 
 def calculate_cosine_sim_matrix(train_set, test_set, clustered=True):
     if clustered:
-        to_use = test_set.loc[test_set['Category'].isin(train_set.Category.unique().tolist())]
+        to_use = test_set.loc[test_set['Subcategory'].isin(train_set.Subcategory.unique().tolist())]
         print('Clustered test set size: ' + str(to_use.shape[0]))
     else:
         to_use = test_set
@@ -131,9 +131,10 @@ if __name__ == '__main__':
         print('User\'s history length: ' + str(train_set.shape[0]))
         create_empty_cosine_sim_matrix(train_set)
         calculate_cosine_sim_matrix(train_set, test_set)
-        recommendations = get_recommendations(1)
+        recommendations = get_recommendations(len(usr_to_post_test[key]))
         calculate_metrics(key, recommendations)
         cosine_matrix.clear()
+        print(metrics)
 
     print('Testing completed -> Let\'s see the metrics')
     overall_metrics()

@@ -16,9 +16,10 @@ def recall(recommendations, ground_truth):
 
 def average_precision(recommendations, ground_truth):
     ap = 0
+    relevant = [elem in ground_truth for elem in recommendations]
     for k in range(1, len(recommendations) + 1):
         r, p = recall_and_precision_at_k(recommendations, k, ground_truth)
-        ap += r * p
+        ap += p*int(relevant[k-1])
 
     return ap / len(ground_truth)
 
