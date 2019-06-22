@@ -1,7 +1,12 @@
-import numpy as np
 import pandas as pd
-from sklearn.feature_extraction.text import CountVectorizer
 import pickle
+import gensim.downloader as api
+import nltk
+import numpy as np
+
+model = api.load("glove-wiki-gigaword-100")
+print(model['man'])
+tokenizer = nltk.RegexpTokenizer(r'\w+')
 
 
 def apply_one_hot(df, categorical_features):
@@ -22,18 +27,25 @@ def make_category(data):
     return df
 
 
+def embedding(title):
+    words = tokenizer.tokenize(title)
+    final_emb = np.zeros((1,100))
+    i = 1
+    for word in words:
+        try:
+            final_emb += np.array(model[word])
+            i += 1
+        except:
+            ()
+    return final_emb/i
+
+
 def make_tags(data):
-    titles = [data[pid]['Title'] for pid in data.keys()]
-    title_vectorizer = CountVectorizer(decode_error='ignore').fit_transform(titles)
-    title_matrix = title_vectorizer.toarray()
+    titles = [[pid] +[i for sub in embedding(data[pid]['Title']).T.tolist() for i in sub] for pid in data.keys()]
+    headers = ['Pid'] + ['title_emb_' + str(i) for i in range(100)]
+    df = pd.DataFrame(titles, columns=headers)
 
-    tags = [' '.join(data[pid]['Alltags']) for pid in data.keys()]
-    tag_vectorizer = CountVectorizer(decode_error='ignore').fit_transform(tags)
-    tag_matrix = tag_vectorizer.toarray()
-
-    pids = np.asarray(list(data.keys()))
-    # title_tags = np.concatenate((title_matrix, tag_matrix), axis=1)
-    return pd.DataFrame(np.concatenate((pids, tag_matrix), axis=1))
+    return df
 
 
 def make_dates(data):
@@ -55,8 +67,8 @@ def split_data(data, usr_data):
     for user in usr_data.keys():
         posts = data.loc[list(usr_data[user].keys())]
         posts.sort_values('Postdate', inplace=True)
-        final_dict[user] = {'train_set': posts.iloc[:int(posts.shape[0]/2)]}
-        final_dict[user]['test_set'] = posts.iloc[int(posts.shape[0]/2):]
+        final_dict[user] = {'train_set': posts.iloc[:int(posts.shape[0] / 2)]}
+        final_dict[user]['test_set'] = posts.iloc[int(posts.shape[0] / 2):]
     return final_dict
 
 
@@ -92,7 +104,7 @@ if __name__ == '__main__':
                         dates_dict[pid][feat_type] = vals[feat_type]
 
     category_data = make_category(category_dict)
-    # tags_data = make_tags(tags_dict)  #TODO: fix problem with dimensions
+    tags_data = make_tags(tags_dict)  #TODO: fix problem with dimensions
     dates_data = make_dates(dates_dict)
     image_data = make_image_fts(image_dict)
 
