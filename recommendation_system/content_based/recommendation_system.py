@@ -1,5 +1,4 @@
-import json
-
+import pickle
 import pandas as pd
 from scipy import spatial
 
@@ -8,36 +7,51 @@ from recommendation_system.metrics.metrics_util import recall_and_precision_at_k
 usr_to_post_test = {}
 post_cos_matrix = {}
 
-train_set = {}
-test_set = {}
 cosine_matrix = {}
 metrics = {}
 
 
 def get_post_to_usr_dict(user_id, user_data):
-    usr_to_post_test[user_id] = user_data["test_set"].keys()
+    usr_to_post_test[user_id] = user_data["test_set"].index.tolist()
 
 
 def prepare_testset(all_data, feature_type):
-    for key, value in all_data.items():
-        for post_key, post_value in value["test_set"].items():
-            test_set[post_key] = post_value[feature_type]
+    frames = []
+    for value in all_data.values():
+        frames += [value['test_set']]
+    all_frames = pd.concat(frames)
+
+    if feature_type == 'category':
+        return all_frames[['Category', 'Concept', 'Subcategory']]
+    elif feature_type == 'image':
+        return all_frames.drop(['Postdate', 'Category', 'Concept', 'Subcategory'], axis=1)
+    else:
+        return all_frames.drop(['Postdate'], axis=1)
 
 
 def prepare_trainset_for_matrix_calculations(user_data, feature_type):
-    for post_key, post_value in user_data["train_set"].items():
-        train_set[post_key] = post_value[feature_type]
+    if feature_type == 'category':
+        return user_data['train_set'][['Category', 'Concept', 'Subcategory']]
+    elif feature_type == 'image':
+        return user_data['train_set'].drop(['Postdate', 'Category', 'Concept', 'Subcategory'], axis=1)
+    else:
+        return user_data['train_set'].drop(['Postdate'], axis=1)
 
 
-def create_empty_cosine_sim_matrix():
-    for key_train, value_train in train_set.items():
+def create_empty_cosine_sim_matrix(train_set):
+    for key_train in train_set.index.tolist():
         cosine_matrix[key_train] = {}
 
 
-def calculate_cosine_sim_matrix():
-    for key_train, value_train in train_set.items():
-        for key_test, value_test in test_set.items():
-            cosine = calculate_cosine(value_train, value_test)
+def calculate_cosine_sim_matrix(train_set, test_set, clustered=True):
+    if clustered:
+        to_use = test_set.loc[test_set['Category'].isin(train_set.Category.unique().tolist())]
+        print('Clustered test set size: ' + str(to_use.shape[0]))
+    else:
+        to_use = test_set
+    for key_train in train_set.index.tolist():
+        for key_test in to_use.index.tolist():
+            cosine = calculate_cosine(train_set.loc[key_train], to_use.loc[key_test])
             cosine_matrix[key_train][key_test] = cosine
 
 
@@ -50,11 +64,6 @@ def get_recommendations(top_k):
     df = df.sum(axis=1)
     df = df.nlargest(top_k)
     return df.index.tolist()
-
-
-def clear_all():
-    cosine_matrix.clear()
-    train_set.clear()
 
 
 def calculate_metrics(user_id, recs):
@@ -107,19 +116,25 @@ def overall_metrics():
 
 
 if __name__ == '__main__':
-    with open('../../data/our_jsons/test.json') as json_file:
-        data_json = json.load(json_file)
+    with open("../../data/our_jsons/final_dataset.pickle", "rb") as input_file:
+        complete_data = pickle.load(input_file)
 
-    prepare_testset(data_json, "all")
+    print('Preparing test set...')
+    test_set = prepare_testset(complete_data, "all")
+    print(test_set.shape[0])
 
-    for key, value in data_json.items():
+    print('Testing on each user...')
+    for key, value in complete_data.items():
+        print('Recommending on user ' + str(key))
         get_post_to_usr_dict(key, value)
-        prepare_trainset_for_matrix_calculations(value, "all")
-        create_empty_cosine_sim_matrix()
-        calculate_cosine_sim_matrix()
+        train_set = prepare_trainset_for_matrix_calculations(value, "all")
+        print('User\'s history length: ' + str(train_set.shape[0]))
+        create_empty_cosine_sim_matrix(train_set)
+        calculate_cosine_sim_matrix(train_set, test_set)
         recommendations = get_recommendations(1)
         calculate_metrics(key, recommendations)
-        clear_all()
+        cosine_matrix.clear()
 
+    print('Testing completed -> Let\'s see the metrics')
     overall_metrics()
     print(metrics)
