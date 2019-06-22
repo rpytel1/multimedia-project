@@ -7,22 +7,10 @@
 
 ## Organization of data for training
 ```bash
-{"user_id1":{"train_set":{"post_id1":{"category":[],
-                                      "tags":[],
-                                      "image":[],
-                                      "all":[]
-                        
-                        
-                                    },
-                          "post_id2":{...}
-                          ...
-                         }
-             "test_set":{same as train_set}
-                  
-                        
-           },
-    }
- "user_id2"{...}
+{"user_id1": {"train_set": dataframe with post ids as index and the features as columns,
+              "test_set": same as train_set
+             },
+ "user_id2": {...},
  ...
 }
 
