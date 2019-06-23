@@ -128,19 +128,20 @@ if __name__ == '__main__':
 
     print('Testing on each user...')
     for key, value in complete_data.items():
-        print('Recommending on user ' + str(key))
-        get_post_to_usr_dict(key, value)
-        train_set = prepare_trainset_for_matrix_calculations(value, "all")
-        print('User\'s history length: ' + str(train_set.shape[0]))
-        create_empty_cosine_sim_matrix(train_set)
-        calculate_cosine_sim_matrix(train_set, test_set)
-        recommendations = get_recommendations(len(usr_to_post_test[key]))
-        calculate_metrics(key, recommendations)
-        cosine_matrix.clear()
-        print(metrics)
+        if value['train_set'].shape[0]:  # in case that the user does not have history
+            print('Recommending on user ' + str(key))
+            get_post_to_usr_dict(key, value)
+            train_set = prepare_trainset_for_matrix_calculations(value, "all")
+            print('User\'s history length: ' + str(train_set.shape[0]))
+            create_empty_cosine_sim_matrix(train_set)
+            calculate_cosine_sim_matrix(train_set, test_set)
+            recommendations = get_recommendations(len(usr_to_post_test[key]))
+            calculate_metrics(key, recommendations)
+            cosine_matrix.clear()
+            print(metrics[key])
 
     print('Testing completed -> Let\'s see the metrics')
     metrics_df = overall_metrics()
     print(metrics_df.describe())
-    with open('data/our_jsons/init_results.pickle', 'wb') as handle:
+    with open('../../data/our_jsons/init_results.pickle', 'wb') as handle:
         pickle.dump(metrics_df, handle, protocol=pickle.HIGHEST_PROTOCOL)

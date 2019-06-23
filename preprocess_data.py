@@ -41,7 +41,7 @@ def embedding(title):
 
 
 def make_tags(data):
-    titles = [[pid] +[i for sub in embedding(data[pid]['Title']).T.tolist() for i in sub] for pid in data.keys()]
+    titles = [[pid] + [i for sub in embedding(data[pid]['Title']).T.tolist() for i in sub] for pid in data.keys()]
     headers = ['Pid'] + ['title_emb_' + str(i) for i in range(100)]
     df = pd.DataFrame(titles, columns=headers)
 
@@ -108,12 +108,12 @@ if __name__ == '__main__':
     dates_data = make_dates(dates_dict)
     image_data = make_image_fts(image_dict)
 
-    all_data = pd.merge(pd.merge(dates_data, category_data, on="Pid"), image_data, on="Pid")
+    all_data = pd.merge(pd.merge(pd.merge(dates_data, category_data, on="Pid"), image_data, on="Pid"), tags_data, on="Pid")
     # all_data = pd.concat([pd.merge(dates_data, category_data, on="Pid"), tags_data.drop([0], axis=1)], axis=1)
     all_data = all_data.set_index('Pid')
 
     final_data = split_data(all_data, complete_data)
-    with open('data/our_jsons/final_dataset.pickle', 'wb') as handle:
+    with open('data/our_jsons/final_dataset_with_tags.pickle', 'wb') as handle:
         pickle.dump(final_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     print('preprocessing completed!!!')
