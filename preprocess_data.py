@@ -29,7 +29,7 @@ def make_category(data):
 
 def embedding(title):
     words = tokenizer.tokenize(title)
-    final_emb = np.zeros((1,100))
+    final_emb = np.zeros((1, 100))
     i = 1
     for word in words:
         try:
@@ -41,8 +41,10 @@ def embedding(title):
 
 
 def make_tags(data):
-    titles = [[pid] + [i for sub in embedding(data[pid]['Title']).T.tolist() for i in sub] for pid in data.keys()]
-    headers = ['Pid'] + ['title_emb_' + str(i) for i in range(100)]
+    titles = [[pid] + [i for sub in embedding(data[pid]['Title']).T.tolist() for i in sub] + [i for sub in embedding(
+        " ".join(data[pid]['Alltags'])).T.tolist() for i in sub] for pid in data.keys()]
+
+    headers = ['Pid'] + ['title_emb_' + str(i) for i in range(100)] + ['tags_emb_' + str(i) for i in range(100)]
     df = pd.DataFrame(titles, columns=headers)
 
     return df
@@ -104,11 +106,13 @@ if __name__ == '__main__':
                         dates_dict[pid][feat_type] = vals[feat_type]
 
     category_data = make_category(category_dict)
-    tags_data = make_tags(tags_dict)  #TODO: fix problem with dimensions
+    tags_data = make_tags(tags_dict)  # TODO: fix problem with dimensions
     dates_data = make_dates(dates_dict)
     image_data = make_image_fts(image_dict)
 
-    all_data = pd.merge(pd.merge(pd.merge(dates_data, category_data, on="Pid"), image_data, on="Pid"), tags_data, on="Pid")
+    all_data = pd.merge(pd.merge(pd.merge(dates_data, category_data, on="Pid"), image_data, on="Pid"), tags_data,
+                        on="Pid")
+    # all_data = pd.concat([pd.merge(dates_data, category_data, on="Pid"), title_data.drop([0], axis=1)], axis=1)
     # all_data = pd.concat([pd.merge(dates_data, category_data, on="Pid"), tags_data.drop([0], axis=1)], axis=1)
     all_data = all_data.set_index('Pid')
 
