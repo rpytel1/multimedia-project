@@ -90,32 +90,6 @@ def overall_metrics():
     metrics_df = pd.DataFrame.from_dict(metrics)
     metrics_df = metrics_df.T
     return metrics_df
-    # precision5 = 0
-    # recall5 = 0
-    # precision10 = 0
-    # recall10 = 0
-    # precision50 = 0
-    # recall50 = 0
-    # mean_average_precision = 0
-    # mrr = 0
-    # for key, value in metrics.items():
-    #     precision5 += value["precision@5"]
-    #     recall5 += value["recall@5"]
-    #     precision10 += value["precision@10"]
-    #     recall10 += value["recall@10"]
-    #     precision50 += value["precision@50"]
-    #     recall50 += value["recall@50"]
-    #     mean_average_precision += value["average_precision"]
-    #     mrr += value["reciprocal_rank"]
-    #
-    # metrics["precision@5"] = precision5 / len(metrics.keys())
-    # metrics["recall@5"] = recall5 / len(metrics.keys())
-    # metrics["precision@10"] = precision10 / len(metrics.keys())
-    # metrics["recall@10"] = recall10 / len(metrics.keys())
-    # metrics["precision@50"] = precision50 / len(metrics.keys())
-    # metrics["recall@50"] = recall50 / len(metrics.keys())
-    # metrics["map"] = mean_average_precision / len(metrics.keys())
-    # metrics["mrr"] = mrr / len(metrics.keys())
 
 
 if __name__ == '__main__':
@@ -132,7 +106,7 @@ if __name__ == '__main__':
             print('Recommending on user ' + str(key))
             get_post_to_usr_dict(key, value)
             train_set = prepare_trainset_for_matrix_calculations(value, "all")
-            print('User\'s history length: ' + str(train_set.shape[0]))
+            print('User\'s history length: ' + str(train_set.shape[0])) 
             create_empty_cosine_sim_matrix(train_set)
             calculate_cosine_sim_matrix(train_set, test_set)
             recommendations = get_recommendations(len(usr_to_post_test[key]))
