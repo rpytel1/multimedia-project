@@ -1,6 +1,8 @@
 import pickle
 import pandas as pd
 from scipy import spatial
+import time
+import json
 
 from recommendation_system.metrics.metrics_util import recall_and_precision_at_k, average_precision, reciprocal_rank
 
@@ -125,18 +127,30 @@ if __name__ == '__main__':
     print(test_set.shape[0])
 
     print('Testing on each user...')
+    j = 0
+    time_needed = {}
+    start = time.time()
     for key, value in complete_data.items():
         if value['train_set'].shape[0]:  # in case that the user does not have history
-            print('Recommending on user ' + str(key))
+            start_per_user = time.time()
+            print('Recommending on user ' + str(key) + ' with order ' + str(j))
             get_post_to_usr_dict(key, value)
             train_set = prepare_trainset_for_matrix_calculations(value, "all")
             print('User\'s history length: ' + str(train_set.shape[0])) 
             create_empty_cosine_sim_matrix(train_set)
             calculate_cosine_sim_matrix(train_set, test_set)
             recommendations = get_recommendations(len(usr_to_post_test[key]))
+            end_per_user = time.time()
+            time_needed[key] = end_per_user - start_per_user
             calculate_metrics(key, recommendations)
             cosine_matrix.clear()
             print(metrics[key])
+            j += 1
+
+    end = time.time()
+    time_needed['total'] = end - start
+    with open('../../data/our_jsons/time_content_based.json', 'w') as outfile:
+        json.dump(time_needed, outfile)
 
     print('Testing completed -> Let\'s see the metrics')
     metrics_df = overall_metrics()

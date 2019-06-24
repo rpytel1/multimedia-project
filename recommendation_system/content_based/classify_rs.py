@@ -3,6 +3,8 @@ import pandas as pd
 from imblearn.under_sampling import EditedNearestNeighbours
 from sklearn.ensemble import RandomForestClassifier
 from recommendation_system.metrics.metrics_util import recall_and_precision_at_k, average_precision, reciprocal_rank
+import time
+import json
 
 metrics = {}
 
@@ -74,9 +76,13 @@ if __name__ == '__main__':
     test_set = prepare_testset(complete_data, "all")
 
     print('Testing on each user...')
+    j = 0
+    time_needed = {}
+    start = time.time()
     for key, value in complete_data.items():
         if value['train_set'].shape[0]:  # in case that the user does not have history
-            print('Recommending on user ' + str(key))
+            print('Recommending on user ' + str(key) + ' with order ' + str(j))
+            start_per_user = time.time()
             train_set = prepare_trainset(key, complete_data, 'all')
             y_train = train_set['label'].values
             x_train = train_set.drop(['label'], axis=1).values
@@ -87,9 +93,15 @@ if __name__ == '__main__':
             y_test = pd.DataFrame(data=y_proba, index=test_set.index.tolist(), columns=['non relevant', 'relevant'])
             y_test.sort_values('relevant', ascending=False, inplace=True)
             recommendations = y_test.iloc[0:value['test_set'].shape[0]].index.tolist()
-            print(value['test_set'].index.tolist())
+            end_per_user = time.time()
+            time_needed[key] = end_per_user - start_per_user
             calculate_metrics(key, recommendations, value['test_set'].index.tolist())
-            print(metrics[key])
+            j += 1
+
+    end = time.time()
+    time_needed['total'] = end - start
+    with open('../../data/our_jsons/time_classify.json', 'w') as outfile:
+        json.dump(time_needed, outfile)
 
     print('Testing completed -> Let\'s see the metrics')
     metrics_df = overall_metrics()

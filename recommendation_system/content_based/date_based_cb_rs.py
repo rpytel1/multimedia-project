@@ -1,4 +1,6 @@
 import pickle
+import json
+import time
 
 from recommendation_system.content_based.content_based_rs import get_post_to_usr_dict, \
     create_empty_cosine_sim_matrix, get_recommendations, usr_to_post_test, cosine_matrix, metrics, calculate_cosine, \
@@ -47,18 +49,30 @@ if __name__ == '__main__':
     print(test_set.shape[0])
 
     print('Testing on each user...')
+    j = 0
+    time_needed = {}
+    start = time.time()
     for key, value in list(complete_data.items())[:1]:
         if value['train_set'].shape[0]:  # in case that the user does not have history
-            print('Recommending on user ' + str(key))
+            print('Recommending on user ' + str(key) + ' with order ' + str(j))
+            start_per_user = time.time()
             get_post_to_usr_dict(key, value)
             train_set = prepare_datebased_trainset_for_matrix_calculations(value, "all")
             print('User\'s history length: ' + str(train_set.shape[0]))
             create_empty_cosine_sim_matrix(train_set)
             date_based_cosine_sim_matrix(train_set, test_set)
             recommendations = get_recommendations(len(usr_to_post_test[key]))
+            end_per_user = time.time()
+            time_needed[key] = end_per_user - start_per_user
             calculate_metrics(key, recommendations)
             cosine_matrix.clear()
             print(metrics[key])
+            j += 1
+
+    end = time.time()
+    time_needed['total'] = end - start
+    with open('../../data/our_jsons/time_date_based.json', 'w') as outfile:
+        json.dump(time_needed, outfile)
 
     print('Testing completed -> Let\'s see the metrics')
     metrics_df = overall_metrics()
