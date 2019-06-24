@@ -43,10 +43,34 @@ def create_empty_cosine_sim_matrix(train_set):
         cosine_matrix[key_train] = {}
 
 
-def calculate_cosine_sim_matrix(train_set, test_set, clustered=True):
+def find_best_concepts(tr_df, tst_df):
+    history_mean = tr_df.mean().drop('Concept')
+    concepts = tst_df.groupby('Concept').mean()
+    print('number of concepts: ' + str(concepts.shape[0]))
+
+    concept_scores = {}
+    for concept_id in concepts.index.tolist():
+        concept_scores[concept_id] = calculate_cosine(history_mean, concepts.loc[concept_id])
+    sorted_concepts = sorted(concept_scores.items(), key=lambda kv: kv[1], reverse=True)
+
+    selected_concepts = []
+    num_posts = 0
+    for c in sorted_concepts:
+        if num_posts > tr_df.shape[0]:
+            break
+        selected_concepts += [c[0]]
+        num_posts += (tst_df.Concept.values == c[0]).sum()
+
+    return tst_df.loc[tst_df['Concept'].isin(selected_concepts)]
+
+
+def calculate_cosine_sim_matrix(train_set, test_set, clustered=True, enhanced=True):
     if clustered:
         to_use = test_set.loc[test_set['Subcategory'].isin(train_set.Subcategory.unique().tolist())]
         print('Clustered test set size: ' + str(to_use.shape[0]))
+        if enhanced:
+            to_use = find_best_concepts(train_set, to_use)
+            print('Enhanced clustered test set size: ' + str(to_use.shape[0]))
     else:
         to_use = test_set
     for key_train in train_set.index.tolist():
