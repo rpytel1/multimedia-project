@@ -106,4 +106,4 @@ lib64
 # End of https://www.gitignore.io/api/pycharm,jupyternotebook
 .idea/
 data/our_jsons/*.json
-
+data/our_jsons/final_dataset_with_tags.pickle

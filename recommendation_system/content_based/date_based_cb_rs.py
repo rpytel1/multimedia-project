@@ -5,7 +5,7 @@ import time
 from recommendation_system.content_based.content_based_rs import get_post_to_usr_dict, \
     create_empty_cosine_sim_matrix, get_recommendations, usr_to_post_test, cosine_matrix, metrics, calculate_cosine, \
     calculate_metrics, prepare_testset, \
-    overall_metrics
+    overall_metrics, find_best_concepts
 
 
 def get_min_max_date(train_set):
@@ -20,9 +20,12 @@ def get_weight(max_date, length, date):
     return 1 - 1 / 2 * (to_max_days / length)
 
 
-def date_based_cosine_sim_matrix(train_set, test_set):
+def date_based_cosine_sim_matrix(train_set, test_set, enhanced=True):
     to_use = test_set.loc[test_set['Subcategory'].isin(train_set.Subcategory.unique().tolist())]
     print('Clustered test set size: ' + str(to_use.shape[0]))
+    if enhanced:
+        to_use = find_best_concepts(train_set, to_use)
+        print('Enhanced clustered test set size: ' + str(to_use.shape[0]))
     max_date, length = get_min_max_date(train_set)
     for key_train in train_set.index.tolist():
         for key_test in to_use.index.tolist():

@@ -78,9 +78,11 @@ if __name__ == '__main__':
     print('Testing on each user...')
     j = 0
     time_needed = {}
+    final_keys = []
     start = time.time()
     for key, value in complete_data.items():
         if value['train_set'].shape[0]:  # in case that the user does not have history
+            final_keys += [key]
             print('Recommending on user ' + str(key) + ' with order ' + str(j))
             start_per_user = time.time()
             train_set = prepare_trainset(key, complete_data, 'all')
@@ -108,3 +110,6 @@ if __name__ == '__main__':
     print(metrics_df.describe())
     with open('../../data/our_jsons/ml_results.pickle', 'wb') as handle:
         pickle.dump(metrics_df, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+    # with open('../../data/our_jsons/final_keys.pickle', 'wb') as handle:
+    #     pickle.dump(final_keys, handle, protocol=pickle.HIGHEST_PROTOCOL)

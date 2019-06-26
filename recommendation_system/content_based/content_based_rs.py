@@ -160,5 +160,5 @@ if __name__ == '__main__':
     with open('../../data/our_jsons/init_results.pickle', 'wb') as handle:
         pickle.dump(metrics_df, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-    with open('../../data/our_jsons/final_keys.pickle', 'wb') as handle:
-        pickle.dump(final_keys, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # with open('../../data/our_jsons/final_keys.pickle', 'wb') as handle:
+    #     pickle.dump(final_keys, handle, protocol=pickle.HIGHEST_PROTOCOL)
