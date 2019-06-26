@@ -16,7 +16,7 @@ def get_min_max_date(train_set):
 
 
 def get_weight(max_date, length, date):
-    to_max_days = (date - max_date).days
+    to_max_days = (max_date - date).days
     return 1 - 1 / 2 * (to_max_days / length)
 
 
