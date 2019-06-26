@@ -12,22 +12,22 @@ def get_min_max_date(train_set):
     min_date = train_set["Postdate"].min()
     max_date = train_set["Postdate"].max()
     length = (max_date - min_date).days
-    return train_set["Postdate"].min(), length
+    return train_set["Postdate"].max(), length
 
 
-def get_weight(min_date, length, date):
-    to_min_days = (date - min_date).days
-    return 1 - 1 / 2 * (to_min_days / length)
+def get_weight(max_date, length, date):
+    to_max_days = (date - max_date).days
+    return 1 - 1 / 2 * (to_max_days / length)
 
 
 def date_based_cosine_sim_matrix(train_set, test_set):
     to_use = test_set.loc[test_set['Subcategory'].isin(train_set.Subcategory.unique().tolist())]
     print('Clustered test set size: ' + str(to_use.shape[0]))
-    min_date, length = get_min_max_date(train_set)
+    max_date, length = get_min_max_date(train_set)
     for key_train in train_set.index.tolist():
         for key_test in to_use.index.tolist():
             cosine = calculate_cosine(train_set.loc[key_train].drop(['Postdate']), to_use.loc[key_test])
-            cosine *= get_weight(min_date, length, train_set.loc[key_train]['Postdate'])
+            cosine *= get_weight(max_date, length, train_set.loc[key_train]['Postdate'])
             cosine_matrix[key_train][key_test] = cosine
 
 
