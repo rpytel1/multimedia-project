@@ -55,7 +55,7 @@ if __name__ == '__main__':
     j = 0
     time_needed = {}
     start = time.time()
-    for key, value in list(complete_data.items())[:1]:
+    for key, value in list(complete_data.items()):
         if value['train_set'].shape[0]:  # in case that the user does not have history
             print('Recommending on user ' + str(key) + ' with order ' + str(j))
             start_per_user = time.time()
