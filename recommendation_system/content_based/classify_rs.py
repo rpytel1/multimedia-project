@@ -10,11 +10,19 @@ metrics = {}
 
 
 def prepare_testset(all_data, feature_type):
+    """
+    Function that generates the test set by concatenating all test sets for each user
+    :param all_data: the user dataset
+    :param feature_type: the feature types to be used
+    :return: the generated test set
+    """
     frames = []
+    # concatenate the test stes
     for value in all_data.values():
         frames += [value['test_set']]
     all_frames = pd.concat(frames)
 
+    # and choose the type of feature to be used
     if feature_type == 'category':
         return all_frames[['Category', 'Concept', 'Subcategory']]
     elif feature_type == 'image':
@@ -24,6 +32,14 @@ def prepare_testset(all_data, feature_type):
 
 
 def prepare_trainset(user_id, all_data, feature_type):
+    """
+    Function that generates the classification training set for each user by assigning the value of 1 to his posts
+    and the value of 0 to the posts of the rest users
+    :param user_id: the user id for which the training set is to be generated
+    :param all_data: the user dataset
+    :param feature_type: the type of features to be used
+    :return: the generated training set
+    """
     frames = []
     for key, value in all_data.items():
         if key == user_id:
@@ -44,6 +60,13 @@ def prepare_trainset(user_id, all_data, feature_type):
 
 
 def calculate_metrics(user_id, recs, ground_truth):
+    """
+    Function for calculating the evaluation metrics for the recommendation task
+    :param user_id: the user id to be checked
+    :param recs: the recommendations made
+    :param ground_truth: the actual recommendations that should have been made
+    :return: update the metrics dictionary with the results for the user with user id user_id
+    """
     metrics[user_id] = {}
 
     recall5, precision5 = recall_and_precision_at_k(recs, 5, ground_truth)
@@ -63,6 +86,10 @@ def calculate_metrics(user_id, recs, ground_truth):
 
 
 def overall_metrics():
+    """
+    Convert the metrics dictionary to dataframe for easier visualization
+    :return: the generated dataframe
+    """
     metrics_df = pd.DataFrame.from_dict(metrics)
     metrics_df = metrics_df.T
     return metrics_df
@@ -79,25 +106,27 @@ if __name__ == '__main__':
     j = 0
     time_needed = {}
     final_keys = []
-    start = time.time()
+    start = time.time()  # for time measuring issues
+    # run the classification procedure for each user
     for key, value in complete_data.items():
         if value['train_set'].shape[0]:  # in case that the user does not have history
             final_keys += [key]
             print('Recommending on user ' + str(key) + ' with order ' + str(j))
             start_per_user = time.time()
-            train_set = prepare_trainset(key, complete_data, 'all')
-            y_train = train_set['label'].values
+            train_set = prepare_trainset(key, complete_data, 'all')  # generate training set
+            y_train = train_set['label'].values  # split the labels from the training set
             x_train = train_set.drop(['label'], axis=1).values
-            x_train, y_train = EditedNearestNeighbours().fit_resample(x_train, y_train)
+            x_train, y_train = EditedNearestNeighbours().fit_resample(x_train, y_train)  # apply under-sampling
             clf = RandomForestClassifier(n_estimators=50, class_weight='balanced')
-            clf.fit(x_train, y_train)
-            y_proba = clf.predict_proba(test_set.values)
+            clf.fit(x_train, y_train)  # and train the Random Forest classifier
+            y_proba = clf.predict_proba(test_set.values)  # obtain the predicted class probabilities
             y_test = pd.DataFrame(data=y_proba, index=test_set.index.tolist(), columns=['non relevant', 'relevant'])
-            y_test.sort_values('relevant', ascending=False, inplace=True)
-            recommendations = y_test.iloc[0:value['test_set'].shape[0]].index.tolist()
+            y_test.sort_values('relevant', ascending=False, inplace=True)  # and sort the recommendations w.r.t
+                                                                           # the y_proba for the relevant class
+            recommendations = y_test.iloc[0:value['test_set'].shape[0]].index.tolist()  # keep the ones needed
             end_per_user = time.time()
             time_needed[key] = end_per_user - start_per_user
-            calculate_metrics(key, recommendations, value['test_set'].index.tolist())
+            calculate_metrics(key, recommendations, value['test_set'].index.tolist())  # and calculate the metrics
             j += 1
 
     end = time.time()
