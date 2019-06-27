@@ -6,6 +6,11 @@ from feature_extraction.image.load_image_util import extract_photo_id, get_photo
 
 
 def get_img_feats(url):
+    """
+    Function for pipeline to extract image related features
+    :param url: url of the image page on Flickr
+    :return: list of features for certain post
+    """
     photo_id = extract_photo_id(url)
     photo_info = get_photo_info(photo_id)
     sizes_info = get_photo_sizes(photo_id)

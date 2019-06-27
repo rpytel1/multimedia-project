@@ -5,6 +5,10 @@ HEIGHT = 25
 
 
 def create_hog_descriptor():
+    """
+    Method creating configured HOG descriptor
+    :return:configured HOG descriptor
+    """
     win_size = (24, 24)
     block_size = (16, 16)
     block_stride = (8, 8)
@@ -21,12 +25,22 @@ def create_hog_descriptor():
 
 
 def resize_img(img):
+    """
+    Method resizing image to designated dimensions. Currently it is 25x25
+    :param img: provided image in original dimensions
+    :return: resized image
+    """
     dim = (WIDTH, HEIGHT)
 
     return cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
 
 
 def extract_hog_feats(img):
+    """
+    Method extracting HOG features for certain image
+    :param img: provided image
+    :return:computed HOG features
+    """
     hog_descriptor = create_hog_descriptor()
     img = resize_img(img)
     return hog_descriptor.compute(img)

@@ -5,6 +5,14 @@ _CV2_BGR2HSV = cv2.COLOR_BGR2HSV
 
 
 def compute_histogram(image, channels, bins, ranges):
+    """
+    universal function to extract histogram from certain image
+    :param image: provided image
+    :param channels: list of channels
+    :param bins: number of bins per each channel
+    :param ranges: what is the range of each of the channel values
+    :return: histogram from provided image taking into account channels and bins
+    """
     histogram = np.zeros(np.sum(bins))
 
     for i in range(0, len(channels)):
@@ -21,6 +29,12 @@ def compute_histogram(image, channels, bins, ranges):
 
 
 def compute_hsv_histogram(image, bins_per_channel):
+    """
+    Function to extract HSV specific histogram
+    :param image: provided image
+    :param bins_per_channel: number of bins per channel
+    :return:HSV features
+    """
     hsv_image = cv2.cvtColor(image, _CV2_BGR2HSV)
     channels = [0, 1, 2]  # List of channels to analyze.
     ranges = [[0, 180], [0, 256], [0, 256]]  # Range per channel.

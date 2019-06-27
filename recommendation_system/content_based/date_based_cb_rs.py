@@ -9,6 +9,11 @@ from recommendation_system.content_based.content_based_rs import get_post_to_usr
 
 
 def get_min_max_date(train_set):
+    """
+    Method to extract maximal date and difference in days between max and min from the avaliable trainset
+    :param train_set: history of the user
+    :return: max date in trainset and the difference in days between max and min date in the trainset
+    """
     min_date = train_set["Postdate"].min()
     max_date = train_set["Postdate"].max()
     length = (max_date - min_date).days
@@ -16,6 +21,13 @@ def get_min_max_date(train_set):
 
 
 def get_weight(max_date, length, date):
+    """
+    Function creating weight for certain train set example
+    :param max_date: maximal date in trainset
+    :param length: difference of days between minimal and maximal date in the trainset
+    :param date: date of the train example
+    :return: weight for certain
+    """
     to_max_days = (max_date - date).days
     if length != 0:
         return 1 - 1 / 2 * (to_max_days / length)
@@ -24,6 +36,15 @@ def get_weight(max_date, length, date):
 
 
 def date_based_cosine_sim_matrix(train_set, test_set, enhanced=True):
+    """
+    Function that calculates the cosine similarity between certain pairs of posts from the train and the test set
+    taking into account date of certain post
+    :param train_set: the training set
+    :param test_set: the test set
+    :param clustered: boolean flag to perform initial "Subcategory" grouping
+    :param enhanced: boolean flag to use the concept enhancement
+    :return: updates the cosine similarity dict of the user
+    """
     to_use = test_set.loc[test_set['Subcategory'].isin(train_set.Subcategory.unique().tolist())]
     print('Clustered test set size: ' + str(to_use.shape[0]))
     if enhanced:
@@ -38,6 +59,12 @@ def date_based_cosine_sim_matrix(train_set, test_set, enhanced=True):
 
 
 def prepare_datebased_trainset_for_matrix_calculations(user_data, feature_type):
+    """
+     Function that generates the training set for each user for datebased approach
+    :param all_data: the user dataset
+    :param feature_type: the feature types to be used
+    :return: the generated training set
+    """
     if feature_type == 'category':
         return user_data['train_set'][['Category', 'Concept', 'Subcategory']]
     elif feature_type == 'image':
